@@ -197,6 +197,7 @@ export async function onboard(req, res) {
             message: 'Onboarding successful',
         });
     } catch (error) {
-        
+        console.error('Error during onboarding:', error);
+        res.status(500).json({ message: 'Internal server error during onboarding' });
     }
 }
