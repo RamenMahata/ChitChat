@@ -67,6 +67,8 @@ export async function signup(req, res) {
                 bio: newUser.bio,
                 profilePic: newUser.profilePic,
                 nativeLanguage: newUser.nativeLanguage,
+                learningLanguage: newUser.learningLanguage,
+                location: newUser.location,
                 isOnboarded: newUser.isOnboarded,
                 friends: newUser.friends,
                 createdAt: newUser.createdAt,
@@ -115,6 +117,8 @@ export async function login(req, res) {
                 bio: user.bio,
                 profilePic: user.profilePic,
                 nativeLanguage: user.nativeLanguage,
+                learningLanguage: user.learningLanguage,
+                location: user.location,
                 isOnboarded: user.isOnboarded,
                 friends: user.friends,
                 createdAt: user.createdAt,
@@ -132,4 +136,68 @@ export async function login(req, res) {
 export function logout(req, res) {
     res.clearCookie('jwt'); // Clear the JWT cookie
     res.status(200).json({ message: 'Logout successful' }); // Respond with success message
+}
+export async function onboard(req, res) {
+    try {
+        const userId = req.user._id; // Get user ID from the request object
+
+        const {fullName, bio, nativeLanguage, learningLanguage, location} = req.body;
+        if (!fullName || !bio || !nativeLanguage || !learningLanguage || !location) {
+            return res.status(400).json({ 
+                message: 'All fields are required',
+                missingFields: [
+                    !fullName && 'fullName',
+                    !bio && 'bio',
+                    !nativeLanguage && 'nativeLanguage',
+                    !learningLanguage && 'learningLanguage',
+                    !location && 'location'
+                ].filter(Boolean), // Filter out undefined values
+            });
+        }
+        const updateUser = await User.findByIdAndUpdate(userId, {
+            ...req.body,
+            isOnboarded: true // Set isOnboarded to true
+        }, {new:true}); // Return the updated user document
+        if (!updateUser) {
+            return res.status(404).json({ message: 'User not found' });
+
+        }
+        // TODO: Upsert user in Stream with updated data
+        try {
+            await upsertStreamUser({
+            id: updateUser._id.toString(), // Use string representation of ObjectId
+            name: updateUser.fullName,
+            image: updateUser.profilePic || '', // Use default profile picture if not set
+        });
+        console.log(`Stream user upserted successfully for user: ${updateUser.fullName}`);
+        
+        } catch (streamError) {
+            console.error("Error upserting Stream user:", streamError.message);
+            return res.status(500).json({ message: 'Internal server error while upserting Stream user' });
+            
+        }
+        
+
+        res.json({
+            success: true,
+            user: {
+                _id: updateUser._id,
+                fullName: updateUser.fullName,
+                email: updateUser.email,
+                bio: updateUser.bio,
+                profilePic: updateUser.profilePic,
+                nativeLanguage: updateUser.nativeLanguage,
+                learningLanguage: updateUser.learningLanguage,
+                location: updateUser.location,
+                isOnboarded: updateUser.isOnboarded,
+                friends: updateUser.friends,
+                createdAt: updateUser.createdAt,
+                updatedAt: updateUser.updatedAt
+            },
+            message: 'Onboarding successful',
+        });
+    } catch (error) {
+        console.error('Error during onboarding:', error);
+        res.status(500).json({ message: 'Internal server error during onboarding' });
+    }
 }

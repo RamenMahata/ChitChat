@@ -28,6 +28,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '', // default value for native language
     },
+    learningLanguage: {
+        type: String,
+        default: '', // default value for learning language
+    },
+    location: {
+        type: String,
+        default: '', // default value for location
+    },
     isOnboarded: {
         type: Boolean,
         default: false, // default value for onboarding status
