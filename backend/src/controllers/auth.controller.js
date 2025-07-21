@@ -1,3 +1,4 @@
+import { upsertStreamUser } from '../lib/stream.js';
 import User from '../models/User.js'; // Importing User model
 import jwt from 'jsonwebtoken'; // Library for generating JSON Web Tokens
 
@@ -33,9 +34,21 @@ export async function signup(req, res) {
             email,
             password,
             profilePic, // Assigning default profile picture
-        })
+        });
 
-        // TODO: Create a user in stream as well
+        // Upsert user in Stream
+        try {
+            await upsertStreamUser({
+                id: newUser._id.toString(), // Use string representation of ObjectId
+                name: newUser.fullName,
+                image: newUser.profilePic || '', // Use default profile picture if not set
+            });
+            console.log(`Stream user upserted successfully for user: ${newUser.fullName}`);
+        } catch (error) {
+           console.log(`Error upserting Stream user for ${newUser.fullName}:`, error);
+            
+        }
+
 
         const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET_KEY, {expiresIn: '7d'}); // Generate JWT token
         res.cookie('jwt', token, {
@@ -70,8 +83,53 @@ export async function signup(req, res) {
     }
 }
 export async function login(req, res) {
-    res.send('Login Route');
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+        
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'Invalid email or password' });
+        }
+        const isPasswordCorrect = await user.matchPassword(password);
+        if (!isPasswordCorrect) {
+            return res.status(404).json({ message: 'Invalid email or password' });
+        }
+
+        const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '7d'}); // Generate JWT token
+        res.cookie('jwt', token, {
+            maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in 7 days
+            httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+            sameSite: 'strict', // Helps prevent CSRF attacks
+            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        });
+
+        res.status(200).json({
+            success: true,
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                bio: user.bio,
+                profilePic: user.profilePic,
+                nativeLanguage: user.nativeLanguage,
+                isOnboarded: user.isOnboarded,
+                friends: user.friends,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            },
+            message: 'Login successful',
+        });
+
+    } catch (error) {
+        console.log('Error in login controller:', error);
+        res.status(500).json({ message: 'Internal server error' });
+        
+    }
 }
 export function logout(req, res) {
-    res.send('Logout Route');
+    res.clearCookie('jwt'); // Clear the JWT cookie
+    res.status(200).json({ message: 'Logout successful' }); // Respond with success message
 }
