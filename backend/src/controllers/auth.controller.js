@@ -91,11 +91,11 @@ export async function login(req, res) {
         
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
         const isPasswordCorrect = await user.matchPassword(password);
         if (!isPasswordCorrect) {
-            return res.status(404).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
         const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '7d'}); // Generate JWT token
