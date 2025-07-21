@@ -51,10 +51,19 @@ export async function signup(req, res) {
                 _id: newUser._id,
                 fullName: newUser.fullName,
                 email: newUser.email,
+<<<<<<< HEAD
+=======
+                bio: newUser.bio,
+>>>>>>> a8bd1672242d5e3dd860a8c4c7b34325c64aba5f
                 profilePic: newUser.profilePic,
                 nativeLanguage: newUser.nativeLanguage,
                 isOnboarded: newUser.isOnboarded,
                 friends: newUser.friends,
+<<<<<<< HEAD
+=======
+                createdAt: newUser.createdAt,
+                updatedAt: newUser.updatedAt
+>>>>>>> a8bd1672242d5e3dd860a8c4c7b34325c64aba5f
             },
             message: 'User created successfully',
         })
