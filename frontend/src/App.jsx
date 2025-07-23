@@ -8,8 +8,23 @@ import NotificationsPage from './pages/NotificationsPage.jsx'
 import CallPage from './pages/CallPage.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import toast, { Toaster } from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
+import { axiosInstance } from './lib/axios.js'
+
 
 const App = () => {
+
+  const {data} = useQuery({
+    queryKey: ['todos'],
+    queryFn: async () => {
+      const response = await axiosInstance.get('/auth/me')
+      return response.data
+    },
+    retry: false, // auth check
+  })
+  console.log({data});
+  
+
   return (
     <div className='h-screen' data-theme="night">
       <button onClick={() => toast.success('Toast created!')}>Create a toast</button>
