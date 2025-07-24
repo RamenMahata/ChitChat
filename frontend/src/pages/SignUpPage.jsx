@@ -1,18 +1,18 @@
-import { QueryClient, useMutation } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShipWheelIcon } from 'lucide-react';
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router';
 import { signup } from '../lib/api';
 
 const SignUpPage = () => {
 
-  const [signupData, setSignupData] = React.useState({
+  const [signupData, setSignupData] = useState({
     fullName: '',
     email: '',
     password: '',
   });
 
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
 
   const { 
     mutate: signupMutation, 
