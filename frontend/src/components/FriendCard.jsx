@@ -36,6 +36,14 @@ const FriendCard = ({ friend }) => {
 
 export default FriendCard
 
+/**
+ * Returns a flag icon image element for the given language, or null if unavailable.
+ * 
+ * Converts the language name to lowercase, looks up the corresponding country code, and returns an image element displaying the flag. Returns null if the language is falsy or no matching flag is found.
+ * 
+ * @param {string} language - The name of the language to display a flag for.
+ * @return {JSX.Element|null} The flag image element, or null if not found.
+ */
 export function getLanguageFlag(language) {
   if(!language) return null;
 
