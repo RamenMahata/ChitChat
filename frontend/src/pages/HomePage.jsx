@@ -11,11 +11,11 @@ const HomePage = () => {
   const queryClient = useQueryClient();
   const [outgoingRequestsIds, setOutgoingRequestsIds] = useState(new Set());
 
-  const {data: friendsData, isLoading:loadingFriends, error:friendsError} = useQuery({
+  const {data: friendsData, isLoading:loadingFriends} = useQuery({
     queryKey: ['friends'],
     queryFn: getUserFriends
   });
-  const friends = Array.isArray(friendsData) ? friendsData : [];
+  const friends = Array.isArray(friendsData?.friends) ? friendsData.friends : [];
   const {data:recommendedUsersData, isLoading:loadingRecommendedUsers} = useQuery({
     queryKey: ['users'],
     queryFn: getRecommendedUsers
