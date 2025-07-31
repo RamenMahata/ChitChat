@@ -9,7 +9,7 @@ import chatRoutes from './routes/chat.routes.js'; //Importing chat-related route
 import { connectDb } from './lib/db.js';
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5001;
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173', // Allow requests from this origin
@@ -30,5 +30,7 @@ app.use('/api/chat', chatRoutes); // Assuming you have chat routes
 app.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`);
     connectDb(); // Connect to the database when the server starts
-    
-})
+});
+
+// Export the app for Vercel
+export default app;
