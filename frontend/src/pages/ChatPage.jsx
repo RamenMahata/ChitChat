@@ -78,7 +78,7 @@ const ChatPage = () => {
   const handleVideoCall = () => {
     // Implement video call functionality here
     if(channel) {
-      const callUrl = `${window.location.origin}/call?${channel.id}`;
+      const callUrl = `${window.location.origin}/call/${channel.id}`;
 
       channel.sendMessage({
         text: `I've started a video call. Click here to join: ${callUrl}`,
