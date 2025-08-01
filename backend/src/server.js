@@ -27,10 +27,15 @@ app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes); // Assuming you have chat routes
 
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port: ${PORT}`);
-    connectDb(); // Connect to the database when the server starts
-});
+// Connect to database immediately for serverless
+connectDb();
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port: ${PORT}`);
+    });
+}
 
 // Export the app for Vercel
 export default app;
