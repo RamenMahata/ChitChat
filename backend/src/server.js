@@ -11,10 +11,30 @@ import { connectDb } from './lib/db.js';
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173', // Allow requests from this origin
+// CORS configuration for multiple environments
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'http://localhost:5173', // Local development
+            'http://localhost:3000', // Alternative local port
+            process.env.CORS_ORIGIN // Production URL from environment
+        ].filter(Boolean); // Remove undefined values
+        
+        if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true, // Include credentials in CORS requests
-})); // Enable CORS
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions)); // Enable CORS
 app.use(express.json()); //Middleware to parse JSON bodies
 app.use(cookieParser()); //Middleware to parse cookies
 
