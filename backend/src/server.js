@@ -2,6 +2,7 @@ import express from 'express'; //Web framework for Node.js
 import "dotenv/config"; //For environment variable management
 import cookieParser from 'cookie-parser'; //Middleware for parsing cookies
 import cors from 'cors'; //Middleware for enabling CORS
+import path from 'path'; //Path module for handling file paths
 
 import authRoutes from './routes/auth.routes.js'; //Importing authentication routes
 import userRoutes from './routes/user.routes.js'; //Importing user-related routes
@@ -10,6 +11,8 @@ import { connectDb } from './lib/db.js';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+const __dirname = path.resolve(); // Get the current directory name
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173', // Allow requests from this origin
@@ -26,6 +29,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes); // Assuming you have chat routes
 
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`);
