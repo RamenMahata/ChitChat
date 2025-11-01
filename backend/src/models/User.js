@@ -47,12 +47,12 @@ const userSchema = new mongoose.Schema({
 
 },{timestamps: true}); // create timestamps for createdAt and updatedAt
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function(next) { //! Important
 
     if (!this.isModified('password')) return next(); // skip hashing if password is not modified and this is a important task to avoid unnecessary hashing
 
 
-    try {
+    try { // Important to learn hashing before save 
         const salt = await bcrypt.genSalt(10); // generate salt for hashing
         this.password = await bcrypt.hash(this.password, salt); // hash the password
         next(); // proceed to save the user

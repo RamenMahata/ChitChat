@@ -1,5 +1,5 @@
-import express from 'express'; //Web framework for Node.js
-import "dotenv/config"; //For environment variable management
+import express from 'express'; //Web framework for Node.js // First
+import "dotenv/config"; //For environment variable management //First
 import cookieParser from 'cookie-parser'; //Middleware for parsing cookies
 import cors from 'cors'; //Middleware for enabling CORS
 import path from 'path'; //Path module for handling file paths
@@ -9,8 +9,8 @@ import userRoutes from './routes/user.routes.js'; //Importing user-related route
 import chatRoutes from './routes/chat.routes.js'; //Importing chat-related routes
 import { connectDb } from './lib/db.js';
 
-const app = express();
-const PORT = process.env.PORT;
+const app = express(); //First
+const PORT = process.env.PORT; //First
 
 const __dirname = path.resolve(); // Get the current directory name
 
@@ -18,6 +18,7 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173', // Allow requests from this origin
     credentials: true, // Include credentials in CORS requests
 })); // Enable CORS
+
 app.use(express.json()); //Middleware to parse JSON bodies
 app.use(cookieParser()); //Middleware to parse cookies
 
@@ -35,5 +36,4 @@ if (process.env.NODE_ENV === 'production') {
 app.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`);
     connectDb(); // Connect to the database when the server starts
-    
-})
+}); //First
