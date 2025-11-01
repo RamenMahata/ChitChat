@@ -7,7 +7,7 @@ export async function signup(req, res) {
     const {email, password, fullName }= req.body;
 
     try {
-        if(!email || !password || !fullName) {
+        if(!email || !password || !fullName) { 
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -54,7 +54,7 @@ export async function signup(req, res) {
         res.cookie('jwt', token, {
             maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in 7 days
             httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-            sameSite: 'strict', // Helps prevent CSRF attacks
+            sameSite: 'strict', // Helps prevent CSRF attacks // Helps prevent cross-site request forgery
             secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
         });
 
@@ -137,6 +137,7 @@ export function logout(req, res) {
     res.clearCookie('jwt'); // Clear the JWT cookie
     res.status(200).json({ message: 'Logout successful' }); // Respond with success message
 }
+
 export async function onboard(req, res) {
     try {
         const userId = req.user._id; // Get user ID from the request object
