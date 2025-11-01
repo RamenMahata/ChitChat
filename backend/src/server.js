@@ -22,6 +22,10 @@ app.use(cors({
 app.use(express.json()); //Middleware to parse JSON bodies
 app.use(cookieParser()); //Middleware to parse cookies
 
+app.get('/', (req, res) => {
+    res.send('Welcome to the Chat Application API');
+}); //Basic route for testing
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes); // Assuming you have chat routes
