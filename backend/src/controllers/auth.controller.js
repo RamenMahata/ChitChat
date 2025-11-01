@@ -1,6 +1,14 @@
 import { upsertStreamUser } from '../lib/stream.js';
 import User from '../models/User.js'; // Importing User model
-import jwt from 'jsonwebtoken'; // Library for generating JSON Web Tokens
+import jwt from 'jsonwebtoken'; /**
+ * Create a new user account, set an authentication cookie, and return the newly created user's public fields.
+ *
+ * Validates required fields (email, password, fullName), password length, and email format; rejects duplicate emails.
+ * Persists the user to the database, attempts to upsert a corresponding external profile (non-blocking on failure),
+ * signs a JWT stored in an HTTP-only cookie with a 7-day expiry, and responds with the user's public fields.
+ *
+ * Responds with 201 on success, 400 for validation or duplicate-email errors, and 500 for unexpected server errors.
+ */
 
 export async function signup(req, res) {
 
@@ -133,11 +141,21 @@ export async function login(req, res) {
         
     }
 }
+/**
+ * Invalidate the current user's session by clearing the JWT cookie and confirming logout.
+ *
+ * Clears the 'jwt' HTTP cookie and sends a 200 response with a logout confirmation message.
+ */
 export function logout(req, res) {
     res.clearCookie('jwt'); // Clear the JWT cookie
     res.status(200).json({ message: 'Logout successful' }); // Respond with success message
 }
 
+/**
+ * Complete onboarding for the authenticated user by validating required fields, updating the user record, and synchronizing the user with the external Stream service.
+ *
+ * Validates that `fullName`, `bio`, `nativeLanguage`, `learningLanguage`, and `location` are present in the request body; if any are missing, responds with 400 and a `missingFields` array. Updates the user document (sets `isOnboarded` to true) and responds with the updated user payload and a success message on success. If the user is not found, responds with 404. If upserting to the Stream service fails or an internal error occurs, responds with 500.
+ */
 export async function onboard(req, res) {
     try {
         const userId = req.user._id; // Get user ID from the request object
